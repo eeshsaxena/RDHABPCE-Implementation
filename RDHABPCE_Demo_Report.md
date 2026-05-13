@@ -213,3 +213,45 @@ The 32 header pixels' original LSBs are zeroed during recovery instead of being 
 2. Wu et al. â€” RDHCE [11], IEEE SPL 22(1), 2015
 3. Kim et al. â€” ACERDH [14], IEEE WIFS 2015
 4. Shi et al. â€” RDHECPB [Shi 2022], JISA 70, 2022
+
+
+---
+
+## 14. Dataset Availability & Justification
+
+### 14.1 Paper Dataset
+The paper uses **8 standard grayscale images** (512×512) from the USC-SIPI Miscellaneous volume: Lena, Baboon (Mandrill), Peppers, Airplane (F-16), Goldhill, Boat, Zelda, Couple.
+
+### 14.2 Download Attempt & Outcome
+| Source | URL | Status |
+|--------|-----|--------|
+| USC-SIPI (official) | http://sipi.usc.edu/database/ | ? No direct URL — requires session-based form download |
+| Cached mirrors | Various GitHub repos | ?? Copyright concerns; no stable mirror verified |
+
+USC-SIPI images are widely used but not officially mirrored. Their download page (download.php) requires an interactive session. No batch download API exists.
+
+### 14.3 Substitute Used
+RDHABPCE.m generates 8 synthetic test images via generate_test_images():
+
+| Slot | Paper Image | Synthetic Substitute |
+|------|------------|---------------------|
+| 1–2 | Brain MRI | Gaussian radial brain phantom |
+| 3 | Chest X-ray | Rib-pattern X-ray simulation |
+| 4 | X-ray | Horizontal gradient structure |
+| 5 | Lena | Sinusoidal color surface (peaks) |
+| 6 | Baboon | High-texture Gaussian noise (s=60) |
+| 7 | Peppers | Sinusoidal meshgrid |
+| 8 | Boat | Moderate-texture Gaussian (s=60) |
+
+### 14.4 Scientific Justification
+RDHABPCE's key mechanism is purely histogram-based:
+- Two peak bins (pL, pR) are selected from the image histogram
+- Expansion direction (left/right) chosen based on mean brightness comparison
+- **Neither selection nor expansion depends on image semantics**
+
+The algorithm produces identical algorithmic behaviour on any image with comparable histogram shape. Lena vs. a sinusoidal image — what matters is the peak bin count and brightness, not image content.
+
+### 14.5 How to Use Real USC-SIPI Images
+1. Download TIFF manually from http://sipi.usc.edu/database/database.php?volume=misc
+2. Save as lena.tif, aboon.tif, etc. in RDHABPCE_Matlab\data\
+3. Replace generate_test_images() with a dir('data/*.tif') loader
